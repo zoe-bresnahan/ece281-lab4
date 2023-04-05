@@ -12,19 +12,27 @@
 --|
 --| FILENAME      : top_basys3.vhd
 --| AUTHOR(S)     : Capt Phillip Warner
---| CREATED       : 02/22/2018
+--| CREATED       : 3/9/2018  MOdified by Capt Dan Johnson (3/30/2020)
 --| DESCRIPTION   : This file implements the top level module for a BASYS 3 to 
---|					drive a Thunderbird taillight controller FSM.
+--|					drive the Lab 4 Design Project (Advanced Elevator Controller).
 --|
---|					Inputs:  clk 	--> 100 MHz clock from FPGA
---|                          sw(15) --> left turn signal
---|                          sw(0)  --> right turn signal
---|                          btnL   --> clk reset
---|                          btnR   --> FSM reset
+--|					Inputs: clk       --> 100 MHz clock from FPGA
+--|							btnL      --> Rst Clk
+--|							btnR      --> Rst FSM
+--|							btnU      --> Rst Master
+--|							btnC      --> GO (request floor)
+--|							sw(15:12) --> Passenger location (floor select bits)
+--| 						sw(3:0)   --> Desired location (floor select bits)
+--| 						 - Minumum FUNCTIONALITY ONLY: sw(1) --> up_down, sw(0) --> stop
 --|							 
---|					Outputs:  led(15:13) --> left turn signal lights
---|					          led(2:0)   --> right turn signal lights
+--|					Outputs: led --> indicates elevator movement with sweeping pattern (additional functionality)
+--|							   - led(10) --> led(15) = MOVING UP
+--|							   - led(5)  --> led(0)  = MOVING DOWN
+--|							   - ALL OFF		     = NOT MOVING
+--|							 an(3:0)    --> seven-segment display anode active-low enable (AN3 ... AN0)
+--|							 seg(6:0)	--> seven-segment display cathodes (CG ... CA.  DP unused)
 --|
+--| DOCUMENTATION : None
 --|
 --+----------------------------------------------------------------------------
 --|
@@ -32,7 +40,8 @@
 --|
 --|    Libraries : ieee
 --|    Packages  : std_logic_1164, numeric_std
---|    Files     : thunderbird_fsm.vhd, clock_divider.vhd
+--|    Files     : MooreElevatorController.vhd, clock_divider.vhd, sevenSegDecoder.vhd
+--|				   thunderbird_fsm.vhd, sevenSegDecoder, TDM4.vhd, OTHERS???
 --|
 --+----------------------------------------------------------------------------
 --|
@@ -61,31 +70,29 @@ library ieee;
   use ieee.numeric_std.all;
 
 
+-- Lab 4
 entity top_basys3 is
-	port(
-
-		clk     :   in std_logic; -- native 100MHz FPGA clock
-		
-		-- Switches (16 total)
-		sw  	:   in std_logic_vector(15 downto 0); -- sw(15) = left; sw(0) = right
-
-		-- LEDs (16 total)
-		-- taillights (LC, LB, LA, RA, RB, RC)
-		led 	:   out std_logic_vector(15 downto 0);  -- led(15:13) --> L
-                                                        -- led(2:0)   --> R
-		
-		-- Buttons (5 total)
-		--btnC	:	in	std_logic
-		--btnU	:	in	std_logic;
-		btnL	:	in	std_logic;                    -- clk_reset
-		btnR	:	in	std_logic	                  -- fsm_reset
-		--btnD	:	in	std_logic;	
-	);
+    port(
+        -- inputs
+        clk     :   in std_logic; -- native 100MHz FPGA clock
+        sw      :   in std_logic_vector(15 downto 0);
+        btnC    :   in std_logic; -- GO
+        btnU    :   in std_logic; -- master_reset
+        btnL    :   in std_logic; -- clk_reset
+        btnR    :   in std_logic; -- fsm_reset
+        
+        -- outputs
+        led :   out std_logic_vector(15 downto 0);
+        -- 7-segment display segments (active-low cathodes)
+        seg :   out std_logic_vector(6 downto 0);
+        -- 7-segment display active-low enables (anodes)
+        an  :   out std_logic_vector(3 downto 0)
+    );
 end top_basys3;
 
 architecture top_basys3_arch of top_basys3 is 
   
-	-- declare components
+	-- declare components and signals
 
   
 begin
@@ -95,12 +102,16 @@ begin
 	
 	-- CONCURRENT STATEMENTS ----------------------------
 	
-	-- ground unused LEDs
+	-- ground unused LEDs (which is all of them for Minimum functionality)
+	led(15 downto 0) <= (others => '0');
+
 	-- leave unused switches UNCONNECTED
 	
 	-- Ignore the warnings associated with these signals
 	-- Alternatively, you can create a different board implementation, 
 	--   or make additional adjustments to the constraints file
-	led(12 downto 3) <= (others => '0');
+	
+	-- wire up active-low 7SD anodes (an) as required
+	-- Tie any unused anodes to power ('1') to keep them off
 	
 end top_basys3_arch;
