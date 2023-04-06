@@ -1,11 +1,11 @@
 ---
 env:
-  TESTBENCH_ENTITY: top_basys
+  TESTBENCH_ENTITY: top_basys3
 
 name: GHDL Build Check
 on: [push]
 jobs:
-  Student-Testbench:
+  GHDL-Synth:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -16,7 +16,6 @@ jobs:
       - run: ghdl --version
       - name: Check out repository code
         uses: actions/checkout@v3
-      - run: ghdl analyze -v src/hdl/${TESTBENCH_ENTITY}.vhd
+      - run: ghdl analyze -v src/hdl/*.vhd
       - run: ls -R
-      - run: ghdl elaborate -v ${TESTBENCH_ENTITY}
-      - run: ghdl synth -v ${TESTBENCH_ENTITY}
+      - run: ghdl synth -v --out=none src/hdl/*.vhd -e ${TESTBENCH_ENTITY}

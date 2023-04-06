@@ -101,14 +101,10 @@ begin
 	
 	-- CONCURRENT STATEMENTS ----------------------------
 	
-	-- ground unused LEDs (which is all of them for Minimum functionality)
-	led(15 downto 0) <= (others => '0');
-
-	-- leave unused switches UNCONNECTED
+	-- LED 15 gets the FSM slow clock signal. The rest are grounded.
 	
-	-- Ignore the warnings associated with these signals
-	-- Alternatively, you can create a different board implementation, 
-	--   or make additional adjustments to the constraints file
+
+	-- leave unused switches UNCONNECTED. Ignore any warnings this causes.
 	
 	-- wire up active-low 7SD anodes (an) as required
 	-- Tie any unused anodes to power ('1') to keep them off
