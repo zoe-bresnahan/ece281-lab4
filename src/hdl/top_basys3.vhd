@@ -76,7 +76,6 @@ entity top_basys3 is
         -- inputs
         clk     :   in std_logic; -- native 100MHz FPGA clock
         sw      :   in std_logic_vector(15 downto 0);
-        btnC    :   in std_logic; -- GO
         btnU    :   in std_logic; -- master_reset
         btnL    :   in std_logic; -- clk_reset
         btnR    :   in std_logic; -- fsm_reset
