@@ -132,11 +132,11 @@ architecture top_basys3_arch of top_basys3 is
         );
     end component clock_divider;
     
-    component hex2bin_converter is 
+    component bin2bin_converter is 
         Port ( i_floor : in STD_LOGIC_VECTOR (3 downto 0);
             o_tens : out STD_LOGIC_VECTOR (3 downto 0);
             o_ones : out STD_LOGIC_VECTOR (3 downto 0));
-    end component hex2bin_converter;
+    end component bin2bin_converter;
     
     --signals
     signal w_clk_slow : std_logic;
@@ -194,7 +194,7 @@ begin
            o_clk    => w_clk_fast
        );
     
-    hex2bin_converter_inst : hex2bin_converter
+    bin2bin_converter_inst : bin2bin_converter
        port map(
            i_floor => w_floor,
            o_tens => w_tens,
